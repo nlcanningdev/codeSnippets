@@ -1,0 +1,12 @@
+Additional Dependencies: 
+d3d12.lib
+dxgi.lib
+d3dcompiler.lib
+
+VC++ Include Directories
+C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.16299.0\shared
+C:\Program Files %28x86%29\Windows Kits\10\Include\10.0.16299.0\um
+
+VC++ Library Directories
+C:\Program Files %28x86%29\Windows Kits\10\Lib\10.0.16299.0\um\x64
+
