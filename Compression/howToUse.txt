@@ -1,0 +1,16 @@
+Only runs on windows, may require windows 8 or 10
+
+ArchiveWriter.exe
+Drag a bunch of files  onto it or add them as command line arguments
+Sorts them into alphabetical order for writing purposes
+Converts them into a compressed archive called trash.violent
+Uses XPRESS-HUFFMAN compression.
+puts the full compressed file size followed by the uncompressed file sizes into archivedata.txt.
+
+Decompressor.exe
+Decompresses the nl.can archive
+
+SFMLTemplate.exe
+Assuming that the second and fourth files you added were png files, this extracts them from the archive and displays them to your monitor using SFML.  This is just intended as a test to see if the set of programs work properly.
+If you want to do something practical with this, modify the source code.
+WAV audio support coming.
