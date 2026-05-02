@@ -1,0 +1,134 @@
+/*when rotating a rectangle, you should only need to know
+the new positions of (0,0), (1,0) and (0,1) to calculate the
+positions of all of the pixels in the rectangle, where (0,0)
+is the top left corner
+
+first, get the starting angle for those three pixels.  this
+should be part of the rectangle from when it's created, so that
+this calculation only needs to be performed onc
+
+to get these angles
+
+uint8_t* pixels; //etc...
+int width = 500;
+int height = 300;
+int x[3] = {0, 1, 0};
+int y[3] = {0, 0, 1};
+double angle[3];
+float wOffset, hOffset;
+wOffset = width / 2;
+hOffset = height / 2;
+for(int a = 0; a < 3; ++a) {
+    x[a] -= wOffset;
+    y[a] -= hOffset;
+}
+
+so, the distance to x=0 and y=0 is known
+which means that you have a right triangle where all three points
+are known.  
+1) centre = (0,0), top point = (0 - wOffset, 0 - hOffset),
+bottom point = (0 - wOffset, 0)
+2) centre = (0,0), top point = (1 - wOffset, 0 - hOffset),
+bottom point = (1 - wOffset, 0)
+3) centre = (0,0), top point = (0 - wOffset, 1 - hOffset),
+bottom point = (0 - wOffset, 0)
+
+so for the 1st point you can write A = tan-1((bottomPointY - topPointY) / (centrePointX - bottomPointX))
+
+in code:
+    double param, result;
+    param = ((bottomPointY - topPointY) / (centrePointX - bottomPointX)); //opposite over adjacent
+    result = atan(param) * 180 / M_PI;
+
+then get the hypotenuse
+
+    double result;
+    result = sqrt(((bottomPointY - topPointY) * (bottomPointY - topPointY)) + ((centrePointX - bottomPointX) * (centrePointX - bottomPointX)));
+
+having the angle of all three points, and the hypotenuse related to all three angles/points, you then add on the rotation angle to all of the angles as required
+then you calculate the new position of the point
+
+ie.
+
+#include <iostream>
+#include <cmath>
+
+int main() {
+    double ang, hyp, opp, adj;
+    ang = 45.0;
+    double adjacent = centrePointX - bottomPointX;
+    double opposite = bottomPointY - topPointY;
+    hyp = sqrt(opposite * opposite + adjacent * adjacent);
+    adj = hyp * (cos(ang * M_PI / 180));
+    opp = hyp * (sin(ang * M_PI / 180));
+    std::cout << "opposite: " << opp << std::endl;
+    std::cout << "adjacent: " << adj << std::endl;
+    return 0;
+}
+the opposite (opp) is the new y value of the point
+the adjacent (adj) is the new x value of the point
+
+c++ always rounds down when converting from double to int, which is a problem
+so you need to do the converstion to int manually
+ie. 
+double param = 5.5;
+if(param - (int)param > 0.5)
+    param = (int) param + 1;
+else
+    param = (int) param;
+
+before you do this conversion, however, you need to save the differences between the three points
+
+//difference of x on the horizontal, ie. difference between (0,0) and (1,0) in terms of x
+//these are all back to assuming that the origin is in the top left, rather than the centre
+double diffHorX = horizontalX - originX;
+double diffHorY = horiztonalY - originY;
+double diffVertX = verticalX - originX;
+double diffVertY = verticalY - originY;
+
+then you figure out how to apply them in a way that makes sense (working on it)
+*/
+
+//round doubles inexpensively
+//use size_t for indices, ie. for everything, to avoid casting
+//write my own tan, atan etc. functions to work with these limitations?
+//actually, not necessary, since those are only calculated once, for the angle
+
+#include <iostream>
+#include <cmath>
+
+double getAngle(int p_x, int p_y, int wOffset, int hOffset) {
+    int x = p_x;
+    int y = p_y;
+    x -= wOffset;
+    y -= hOffset;
+    double param = (double)y / (double)x;
+    return atan(param) * 180.0 / M_PI;
+}
+
+int main() {
+    int width, height, screenWidth, screenHeight;
+    std::cout << "width: ";
+    std::cin >> width;
+    std::cout << "height: ";
+    std::cin >> height;
+    if(width > height) {
+        screenWidth = width * 2;
+        screenHeight = width * 2;
+    }
+    else {
+        screenWidth = height * 2;
+        screenHeight = height * 2;
+    }
+    int x[3] = {0, 1, 0};
+    int y[3] = {0, 0, 1};
+    double startAngle[3];
+    int wOffset = width / 2; //never use odd numbers for width or image sizes
+    int hOffset = height / 2;
+    for(int a = 0; a < 3; ++a) {
+        startAngle[a] = getAngle(x[a], y[a], wOffset,hOffset);
+        std::cout << a << ": " << startAngle[a] << std::endl;
+    }
+    double rotatedAngle[3];
+    return 0;
+}
